@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://shadowbench.dev/schemas/ipc.schema.json",
+  "title": "ShadowBench IPC Contract",
+  "description": "Versioned command/response contract between the Tauri frontend and the Python sidecar (JSON-RPC over stdio). See core/src/shadowbench/ipc/server.py.",
+  "type": "object",
+  "properties": {
+    "protocol_version": { "type": "integer", "const": 1 },
+    "commands": {
+      "type": "object",
+      "properties": {
+        "profile_system": {
+          "description": "Detect hardware. Returns a HardwareProfile.",
+          "params": { "run_stress_test": { "type": "boolean", "default": true } }
+        },
+        "analyze_requirement": {
+          "description": "Recommend a model. Returns a Recommendation.",
+          "params": {
+            "task": { "enum": ["coding", "chat", "reasoning", "general"] },
+            "profile": { "enum": ["speed", "intelligence"] },
+            "context_length": { "type": "integer" }
+          }
+        },
+        "run_model": {
+          "description": "Download (if needed) and launch a local engine. Returns an EngineHandle.",
+          "params": {
+            "model_id": { "type": "string" },
+            "quantization": { "type": "string" },
+            "flags": { "type": "string" }
+          }
+        }
+      }
+    }
+  },
+  "required": ["protocol_version", "commands"]
+}

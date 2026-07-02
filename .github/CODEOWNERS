@@ -1,0 +1,14 @@
+# Default owners for everything in the repo.
+# Replace @maintainer with real GitHub handles before public launch.
+*                       @maintainer
+
+# Module owners — routes reviews to the right people per component.
+/core/src/shadowbench/profiler/    @maintainer
+/core/src/shadowbench/predictor/   @maintainer
+/core/src/shadowbench/pool/        @maintainer
+/frontend/                         @maintainer
+
+# Security-sensitive areas require explicit review.
+/core/src/shadowbench/pool/security.py   @maintainer
+/SECURITY.md                             @maintainer
+/.github/workflows/                      @maintainer

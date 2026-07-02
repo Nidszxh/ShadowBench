@@ -1,0 +1,49 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+.env
+.python-version
+
+# uv
+uv.lock.bak
+
+# Testing / coverage
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Node / frontend
+node_modules/
+frontend/dist/
+frontend/.vite/
+
+# Tauri / Rust
+frontend/src-tauri/target/
+target/
+
+# Local data & models (never commit large binaries or user data)
+*.gguf
+*.sqlite
+*.sqlite3
+*.db
+data/
+models/
+
+# Docs build
+site/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp

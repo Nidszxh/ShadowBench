@@ -69,5 +69,20 @@ See [`ARCHITECTURE.md`](./ARCHITECTURE.md) for system design and [`DATAFLOW.md`]
 
 - [`ARCHITECTURE.md`](./ARCHITECTURE.md) — system components and how they're organized
 - [`DATAFLOW.md`](./DATAFLOW.md) — request/response lifecycle, P2P protocol, database schema
-- [`ROADMAP.md`](./ROADMAP.md) — phased delivery plan
+- [`PROJECT_STRUCTURE.md`](./PROJECT_STRUCTURE.md) — the component-wise monorepo layout
+- [`MILESTONES.md`](./MILESTONES.md) — production open-source delivery plan (v0.0.1 → v1.0.0)
+- [`ROADMAP.md`](./ROADMAP.md) — original phased feature plan
 - [`IMPLEMENTATION_PLAN.md`](./IMPLEMENTATION_PLAN.md) — granular build steps, testing, deployment
+- [`CONTRIBUTING.md`](./CONTRIBUTING.md) · [`SECURITY.md`](./SECURITY.md) · [`GOVERNANCE.md`](./GOVERNANCE.md)
+
+## 9. Building From Source (current state)
+
+Phase 0 scaffolding is in place: the Python core (`core/`) profiles hardware and recommends models today.
+
+```bash
+scripts/bootstrap.sh              # installs deps + hooks, runs checks
+# or manually:
+cd core && uv sync --all-extras
+uv run shadowbench profile        # print this machine's hardware profile
+uv run shadowbench recommend --task coding --profile intelligence
+```
