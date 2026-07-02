@@ -1,0 +1,26 @@
+name: Accuracy
+
+# Phase 2 (P2.5): score the Predictor against datasets/golden.jsonl and publish a predicted-vs-actual report.
+# Runs on demand now; becomes a required check (fail on regression) once calibration/report.py lands.
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "core/src/shadowbench/predictor/**"
+      - "datasets/golden.jsonl"
+
+jobs:
+  accuracy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: core
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+      - run: uv sync --all-extras --dev
+      - name: Accuracy report (Phase 2 placeholder)
+        run: echo "calibration/report.py evaluate lands in Phase 2 (P2.5)"

@@ -1,0 +1,1 @@
+{"schema_version": 1, "gpu_name": "NVIDIA GeForce RTX 4060 Laptop GPU", "vram_total_mb": 8192, "system_ram_gb": 32, "host_to_device_gbps": 12.4, "model_id": "Qwen/Qwen3.5-35B-A3B-GGUF", "quantization": "Q4_K_M", "context_length": 4096, "measured_tps": 13.8, "source": "seed/maintainer", "notes": "example row — replace with real measurements"}
