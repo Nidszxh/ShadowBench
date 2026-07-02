@@ -117,6 +117,25 @@ Maps to roadmap Phase 5 + everything "1.0-worthy."
 1. **Python-sidecar packaging + code signing** — the biggest tax of the stack choice. De-risk with a throwaway *signed* hello-world sidecar build by Phase 1, or it bites in Phase 3.
 2. **P2P security is public-facing.** An OSS tool inviting strangers to share GPU compute over LAN is a target. `SECURITY.md` + threat model + pairing confirmation are prerequisites for trusting `v1.0`, not polish.
 
+## Review-driven additions
+
+An external architecture review ([`../../ARCHITECTURE_REVIEW.md`](../../ARCHITECTURE_REVIEW.md)) surfaced gaps now folded into the phases above:
+
+| Item | Phase |
+|---|---|
+| GGUF malformed-metadata fallback | P1.3 |
+| Cold-start accuracy expectation (pre-calibration ±band) | P2.5 |
+| Pre-flight disk-space check + resumable partials | P3.3 |
+| Signed/checksummed model downloads before spawn | P3.3 |
+| mDNS discovery fallback (manual peer-add for AP client-isolation) | P4.1 |
+| TLS fingerprint pinning on pairing (anti-spoofing) | P4.2 |
+| Concurrent-routing arbitration (queue-depth advertisement) | P4.3 |
+| Requester-side proxy supervision / auto-restart | P4.3 / P5.1 |
+| Circuit breaker for flaky peers | P5.1 |
+| Telemetry outlier filtering (anti-poisoning) | P5.3 |
+
+Two suggestions need a decision (see the review): **`sysinfo`/Rust vs. the Python sidecar** (revisit at P3.2) and **adopting `libp2p`/`iroh` before hand-rolling P2P crypto** (spike at P4.2).
+
 ## Version → milestone map
 
 | Version | Phase | Headline |

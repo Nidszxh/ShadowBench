@@ -28,9 +28,12 @@ The pool's trust boundary is the local network segment discovered via mDNS. The 
 |---|---|
 | Eavesdropping on peer traffic | All node-to-node traffic over TLS (`wss://`) using certs generated locally at startup. |
 | Malicious peer joining the pool | Explicit **pairing confirmation** (PIN/QR) before a peer can send work — not silent trust-on-first-use. |
+| Peer impersonation / mDNS spoofing | mDNS advertisements are unauthenticated, so a spoofed "fast peer" could harvest prompts. Pairing **pins the peer's TLS fingerprint** to its `node_id` on first accept (TOFU); a later fingerprint change is rejected as impersonation. |
+| Malicious / tampered model download | GGUF files are verified against a known-good **SHA-256** (and publisher signature where available) **before** the inference engine process is spawned. No hash → explicit user confirmation. |
 | Prompt payload escaping into the host | Provider nodes accept **prompt strings only** — no filesystem, environment, or loopback network access from a request. Enforced and fuzz-tested. |
-| Resource exhaustion / DoS from a peer | Per-peer rate limits and request-size caps on the proxy. |
+| Resource exhaustion / DoS from a peer | Per-peer rate limits and request-size caps on the proxy, plus a routing **circuit breaker** that deprioritizes nodes exceeding failure/latency thresholds. |
 | Telemetry leaking PII | Opt-in only, default-off. An automated test asserts payloads contain **no** hostname, IP, or user identifier before any upload. |
+| Poisoned crowd-sourced telemetry | Submissions pass a plausibility gate (physical bounds) + per-`(gpu,model,quant)` outlier rejection before entering the public dataset. |
 
 ## Out of scope (pre-1.0)
 
