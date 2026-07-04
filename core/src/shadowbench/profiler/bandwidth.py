@@ -21,6 +21,33 @@ logger = get_logger(__name__)
 
 #: Square matrix dimension for the GEMM stress kernel. FP32 → ~0.5 GB working set at N=4096.
 _MATRIX_N = 2048
+#: Size of the buffer (MB) for the system RAM bandwidth measurement.
+_RAM_BW_BUFFER_MB = 512
+#: Default fallback when measurement fails.
+_DEFAULT_RAM_GBPS = 30.0
+
+
+def _measure_ram_bandwidth(buffer_mb: int = _RAM_BW_BUFFER_MB) -> float:
+    """Estimate system RAM sequential-read bandwidth (GB/s) via timed memcpy.
+
+    Uses ``memoryview`` cast to ``uint64`` and a simple sum, which compiles down to a tight
+    SIMD-optimised loop in numpy.  This is a good proxy for the CPU-side read pattern during
+    expert-offload inference.
+    """
+    try:
+        size = buffer_mb * 1024 * 1024 // 8  # uint64 elements
+        buf = np.empty(size, dtype=np.uint64)
+        buf[:] = 1  # force physical page allocation
+        t0 = time.perf_counter()
+        _ = int(buf.sum())
+        elapsed = time.perf_counter() - t0
+        if elapsed <= 0:
+            return _DEFAULT_RAM_GBPS
+        gbps = buf.nbytes / elapsed / 1e9
+        return round(gbps, 1)
+    except Exception:
+        logger.debug("RAM bandwidth measurement failed, using default %.1f GB/s", _DEFAULT_RAM_GBPS)
+        return _DEFAULT_RAM_GBPS
 
 
 def run_bandwidth_test(budget_seconds: float = 3.0) -> BandwidthResult:
@@ -55,8 +82,11 @@ def run_bandwidth_test(budget_seconds: float = 3.0) -> BandwidthResult:
         "bandwidth: %d iters in %.2fs → %.1f TFLOPS, %.1f GB/s", iterations, elapsed, tflops, gbps
     )
 
+    ram_gbps = _measure_ram_bandwidth()
+
     return BandwidthResult(
-        host_to_device_gbps=round(gbps, 2),
+        cpu_matmul_gbps=round(gbps, 2),
         device_compute_tflops=round(tflops, 3),
         duration_s=round(elapsed, 2),
+        system_ram_gbps=ram_gbps,
     )

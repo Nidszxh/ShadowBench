@@ -37,12 +37,14 @@ class SystemInfo(BaseModel):
 class BandwidthResult(BaseModel):
     """Measured — not spec-sheet — data-transfer and compute throughput.
 
-    ``host_to_device_gbps`` is the number that predicts the VRAM-spillover cliff (``DATAFLOW.md §1.3``).
+    ``cpu_matmul_gbps`` is the CPU matmul benchmark, retained for future multi-GPU topologies.
+    ``system_ram_gbps`` is the CPU-side memory bandwidth used to estimate CPU-offloaded inference performance.
     """
 
-    host_to_device_gbps: float
+    cpu_matmul_gbps: float
     device_compute_tflops: float
     duration_s: float
+    system_ram_gbps: float = 0.0
 
 
 class HardwareProfile(BaseModel):
@@ -69,9 +71,7 @@ class HardwareProfile(BaseModel):
             "gpu_name": self.gpu.name if self.gpu else None,
             "vram_bucket_gb": _bucket_gb(self.gpu.vram_total_mb) if self.gpu else 0,
             "ram_bucket_gb": _bucket_gb(self.system.ram_total_mb),
-            "host_to_device_gbps": round(self.bandwidth.host_to_device_gbps, 1)
-            if self.bandwidth
-            else None,
+            "cpu_matmul_gbps": round(self.bandwidth.cpu_matmul_gbps, 1) if self.bandwidth else None,
             "compute_tflops": round(self.bandwidth.device_compute_tflops, 1)
             if self.bandwidth
             else None,
@@ -79,6 +79,10 @@ class HardwareProfile(BaseModel):
 
 
 def _bucket_gb(mb: int) -> int:
-    """Bucket a megabyte value to the nearest 4 GB to avoid exact fingerprinting."""
-    gb = mb / 1024
+    """Bucket a megabyte value to the nearest 4 GB to avoid exact fingerprinting.
+
+    Uses decimal GB (1 GB = 1000 MB) to stay consistent with the predictor formulas, which
+    use ``1e9`` for byte-to-GB conversion (SI prefix convention).
+    """
+    gb = mb / 1000
     return round(gb / 4) * 4

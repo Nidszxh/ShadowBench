@@ -22,7 +22,7 @@ CI fails if median error regresses past the target band.
 | `gpu_name` | string \| null | `null` for CPU-only |
 | `vram_total_mb` | int | `0` for CPU-only |
 | `system_ram_gb` | int | |
-| `host_to_device_gbps` | float | Measured PCIe bandwidth from `shadowbench profile` |
+| `cpu_matmul_gbps` | float | CPU matmul benchmark (reserved for future multi-GPU topology) |
 | `model_id` | string | Must match a `models_catalog.json` id |
 | `quantization` | string | e.g. `Q4_K_M` |
 | `context_length` | int | |

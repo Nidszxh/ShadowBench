@@ -42,7 +42,7 @@ def make_profile() -> ProfileBuilder:
             ),
             gpu=gpu,
             bandwidth=BandwidthResult(
-                host_to_device_gbps=pcie_gbps,
+                cpu_matmul_gbps=pcie_gbps,
                 device_compute_tflops=20.0,
                 duration_s=3.0,
             ),

@@ -7,7 +7,7 @@ public entry point of the Predictor module.
 from __future__ import annotations
 
 from shadowbench.common.errors import PredictorError
-from shadowbench.common.types import Quantization, Task, UserProfile
+from shadowbench.common.types import KVCacheQuantization, Quantization, Task, UserProfile
 from shadowbench.predictor import memory
 from shadowbench.predictor.catalog import candidates_for_task
 from shadowbench.predictor.config_coach import build_flags
@@ -24,6 +24,13 @@ _QUANT_PREFERENCE = (
     Quantization.Q5_K_M,
     Quantization.Q4_K_M,
     Quantization.Q3_K_M,
+    Quantization.Q2_K,
+)
+#: KV-cache quant preference — best quality first; downgrades save VRAM at negligible quality cost.
+_KV_CACHE_PREFERENCE = (
+    KVCacheQuantization.FP16,
+    KVCacheQuantization.Q8_0,
+    KVCacheQuantization.Q4_0,
 )
 
 
@@ -64,25 +71,32 @@ def _best_recommendation_for(
 ) -> Recommendation | None:
     """Pick the highest-quality quant for one model that stays usable on this hardware."""
     ctx = context_length or spec.context_default
-    vram_gb = (profile.gpu.vram_total_mb / 1024) if profile.gpu else 0.0
-    pcie_gbps = profile.bandwidth.host_to_device_gbps if profile.bandwidth else 8.0
+    vram_gb = (profile.gpu.vram_total_mb / 1000) if profile.gpu else 0.0
+    pcie_gbps = profile.bandwidth.cpu_matmul_gbps if profile.bandwidth else 8.0
+    ram_gbps = profile.bandwidth.system_ram_gbps if profile.bandwidth else 30.0
 
     for quant in _QUANT_PREFERENCE:
         if quant not in spec.available_quants:
             continue
-        prediction, offloaded = _predict(spec, quant, ctx, vram_gb, pcie_gbps)
-        if prediction.predicted_tps >= _MIN_USABLE_TPS:
-            flags = build_flags(
-                spec,
-                vram_total_gb=vram_gb,
-                pcie_gbps=pcie_gbps,
-                experts_offloaded_fraction=offloaded,
+        for kv_quant in _KV_CACHE_PREFERENCE:
+            prediction, offloaded = _predict(
+                spec, quant, ctx, vram_gb, pcie_gbps, ram_gbps, kv_quant=kv_quant
             )
-            return Recommendation(
-                prediction=prediction,
-                flags=flags,
-                rationale=_rationale(spec, prediction),
-            )
+            if prediction.predicted_tps >= _MIN_USABLE_TPS:
+                flags = build_flags(
+                    spec,
+                    vram_total_gb=vram_gb,
+                    pcie_gbps=pcie_gbps,
+                    experts_offloaded_fraction=offloaded,
+                    ram_bandwidth_gbps=ram_gbps,
+                    context_length=ctx,
+                    kv_cache_quant=kv_quant,
+                )
+                return Recommendation(
+                    prediction=prediction,
+                    flags=flags,
+                    rationale=_rationale(spec, prediction),
+                )
     return None
 
 
@@ -92,14 +106,34 @@ def _predict(
     ctx: int,
     vram_gb: float,
     pcie_gbps: float,
+    ram_gbps: float = 30.0,
+    *,
+    kv_quant: KVCacheQuantization = KVCacheQuantization.FP16,
 ) -> tuple[Prediction, float]:
     """Run the topology-appropriate throughput model. Returns (prediction, offloaded_fraction)."""
     weight_gb = memory.dense_weight_gb(spec.n_params_billions, quant)
-    kv_gb = memory.kv_cache_gb(spec.n_layers, spec.n_kv_heads, spec.head_dim, ctx)
+    kv_gb = memory.kv_cache_gb(
+        spec.n_layers, spec.n_kv_heads, spec.head_dim, ctx, kv_quant=kv_quant
+    )
 
     if spec.is_moe and spec.n_experts and spec.n_experts_active:
+        from shadowbench.predictor.moe import compute_base_fraction
+
+        base_frac = compute_base_fraction(
+            spec.n_params_billions,
+            spec.n_params_active_billions,
+            spec.n_experts,
+            spec.n_experts_active,
+        )
         est = estimate_moe_tps(
-            weight_gb, kv_gb, spec.n_experts, spec.n_experts_active, vram_gb, pcie_gbps
+            weight_gb,
+            kv_gb,
+            spec.n_experts,
+            spec.n_experts_active,
+            vram_gb,
+            ram_gbps,
+            pcie_gbps,
+            base_fraction=base_frac,
         )
         prediction = Prediction(
             model_id=spec.id,
@@ -113,7 +147,7 @@ def _predict(
         )
         return prediction, est.experts_offloaded_fraction
 
-    est_d = estimate_dense_tps(weight_gb, kv_gb, vram_gb, pcie_gbps)
+    est_d = estimate_dense_tps(weight_gb, kv_gb, vram_gb, ram_gbps, pcie_gbps)
     prediction = Prediction(
         model_id=spec.id,
         quantization=quant,
