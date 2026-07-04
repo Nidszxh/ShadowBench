@@ -11,14 +11,20 @@ from shadowbench.profiler.models import GpuInfo
 
 class NvidiaBackend(GpuBackend):
     priority = 10
+    _initialized = False
 
     def is_available(self) -> bool:
+        if self._initialized:
+            return True
         try:
             import pynvml
 
             pynvml.nvmlInit()
             available = pynvml.nvmlDeviceGetCount() > 0
-            pynvml.nvmlShutdown()
+            if available:
+                self._initialized = True
+            else:
+                pynvml.nvmlShutdown()
             return bool(available)
         except Exception:
             return False
@@ -26,27 +32,26 @@ class NvidiaBackend(GpuBackend):
     def probe(self) -> GpuInfo:
         import pynvml
 
-        pynvml.nvmlInit()
+        if not self._initialized:
+            pynvml.nvmlInit()
+            self._initialized = True
+        handle = pynvml.nvmlDeviceGetHandleByIndex(0)
+        mem = pynvml.nvmlDeviceGetMemoryInfo(handle)
+        name = pynvml.nvmlDeviceGetName(handle)
+        if isinstance(name, bytes):
+            name = name.decode()
         try:
-            handle = pynvml.nvmlDeviceGetHandleByIndex(0)
-            mem = pynvml.nvmlDeviceGetMemoryInfo(handle)
-            name = pynvml.nvmlDeviceGetName(handle)
-            if isinstance(name, bytes):
-                name = name.decode()
-            try:
-                temp = float(pynvml.nvmlDeviceGetTemperature(handle, pynvml.NVML_TEMPERATURE_GPU))
-            except Exception:
-                temp = None
-            driver = pynvml.nvmlSystemGetDriverVersion()
-            if isinstance(driver, bytes):
-                driver = driver.decode()
-            return GpuInfo(
-                vendor="nvidia",
-                name=name,
-                vram_total_mb=int(mem.total // (1024 * 1024)),
-                vram_free_mb=int(mem.free // (1024 * 1024)),
-                temperature_c=temp,
-                driver_version=driver,
-            )
-        finally:
-            pynvml.nvmlShutdown()
+            temp = float(pynvml.nvmlDeviceGetTemperature(handle, pynvml.NVML_TEMPERATURE_GPU))
+        except Exception:
+            temp = None
+        driver = pynvml.nvmlSystemGetDriverVersion()
+        if isinstance(driver, bytes):
+            driver = driver.decode()
+        return GpuInfo(
+            vendor="nvidia",
+            name=name,
+            vram_total_mb=int(mem.total // (1024 * 1024)),
+            vram_free_mb=int(mem.free // (1024 * 1024)),
+            temperature_c=temp,
+            driver_version=driver,
+        )

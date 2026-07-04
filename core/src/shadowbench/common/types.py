@@ -62,3 +62,26 @@ _EFFECTIVE_BPW: dict[Quantization, float] = {
     Quantization.Q8_0: 8.50,
     Quantization.FP16: 16.0,
 }
+
+
+class KVCacheQuantization(str, Enum):
+    """KV-cache quantization precision (``--cache-type-k`` / ``--cache-type-v``).
+
+    ``bytes_per_elem`` is the storage cost per K *or* V element (K and V are stored separately, hence the
+    ``2×`` multiplier in the KV-cache formula).
+    """
+
+    FP16 = "f16"
+    Q8_0 = "q8_0"
+    Q4_0 = "q4_0"
+
+    @property
+    def bytes_per_elem(self) -> float:
+        return _KV_CACHE_BYTES[self]
+
+
+_KV_CACHE_BYTES: dict[KVCacheQuantization, float] = {
+    KVCacheQuantization.FP16: 2.0,
+    KVCacheQuantization.Q8_0: 1.0,
+    KVCacheQuantization.Q4_0: 0.5,
+}

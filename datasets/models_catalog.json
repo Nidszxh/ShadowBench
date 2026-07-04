@@ -12,7 +12,7 @@
       "n_kv_heads": 8,
       "head_dim": 128,
       "context_default": 8192,
-      "available_quants": ["Q4_K_M", "Q5_K_M", "Q6_K", "Q8_0"]
+      "available_quants": ["Q2_K", "Q4_K_M", "Q5_K_M", "Q6_K", "Q8_0"]
     },
     {
       "id": "mistralai/Mistral-7B-Instruct-v0.3-GGUF",
@@ -24,7 +24,7 @@
       "n_kv_heads": 8,
       "head_dim": 128,
       "context_default": 8192,
-      "available_quants": ["Q4_K_M", "Q5_K_M", "Q6_K", "Q8_0"]
+      "available_quants": ["Q2_K", "Q4_K_M", "Q5_K_M", "Q6_K", "Q8_0"]
     },
     {
       "id": "microsoft/Phi-3-medium-4k-instruct-GGUF",
@@ -36,7 +36,7 @@
       "n_kv_heads": 10,
       "head_dim": 128,
       "context_default": 4096,
-      "available_quants": ["Q4_K_M", "Q5_K_M", "Q6_K"]
+      "available_quants": ["Q2_K", "Q4_K_M", "Q5_K_M", "Q6_K"]
     },
     {
       "id": "deepseek-ai/DeepSeek-R1-Distill-Qwen-14B-GGUF",
@@ -48,21 +48,34 @@
       "n_kv_heads": 8,
       "head_dim": 128,
       "context_default": 4096,
-      "available_quants": ["Q4_K_M", "Q5_K_M", "Q6_K"]
+      "available_quants": ["Q2_K", "Q4_K_M", "Q5_K_M", "Q6_K"]
     },
     {
-      "id": "Qwen/Qwen3.5-35B-A3B-GGUF",
-      "name": "Qwen3.5 35B-A3B (MoE)",
+      "id": "Qwen/Qwen3.6-35B-A3B-GGUF",
+      "name": "Qwen3.6 35B-A3B (MoE)",
       "topology": "moe",
       "tasks": ["coding", "reasoning", "general"],
       "n_params_billions": 35.0,
+      "n_params_active_billions": 3.0,
       "n_layers": 48,
       "n_kv_heads": 8,
       "head_dim": 128,
       "context_default": 4096,
-      "available_quants": ["Q4_K_M", "Q5_K_M", "Q6_K"],
-      "n_experts": 128,
+      "available_quants": ["Q2_K", "Q4_K_M", "Q5_K_M", "Q6_K"],
+      "n_experts": 256,
       "n_experts_active": 8
+    },
+    {
+      "id": "meta-llama/Llama-3.2-1B-Instruct-GGUF",
+      "name": "Llama 3.2 1B Instruct",
+      "topology": "dense",
+      "tasks": ["general", "chat"],
+      "n_params_billions": 1.24,
+      "n_layers": 16,
+      "n_kv_heads": 8,
+      "head_dim": 64,
+      "context_default": 8192,
+      "available_quants": ["Q2_K", "Q4_K_M", "Q5_K_M", "Q6_K", "Q8_0"]
     }
   ]
 }

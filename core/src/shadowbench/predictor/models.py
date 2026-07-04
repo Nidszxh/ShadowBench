@@ -15,6 +15,7 @@ class ModelSpec(BaseModel):
     topology: ModelTopology
     tasks: list[Task]
     n_params_billions: float
+    n_params_active_billions: float | None = None
     n_layers: int
     n_kv_heads: int
     head_dim: int
@@ -32,18 +33,39 @@ class ModelSpec(BaseModel):
 class RuntimeFlags(BaseModel):
     """Config Coach output — exact flags handed to llama.cpp / Ollama."""
 
-    ngl: int = Field(99, description="--ngl: layers offloaded to GPU")
+    ngl: int = Field(
+        99,
+        description="--ngl: GPU layers (99 = all for known models, max layers is <99 for all current architectures)",
+    )
     n_cpu_moe: int | None = Field(None, description="--n-cpu-moe: MoE expert layers kept on CPU")
     ubatch: int = Field(512, description="-ub / --ubatch: prefill micro-batch size")
     parallel: int = Field(1, description="--parallel: concurrent inference slots")
-    no_mmap: bool = Field(False, description="--no-mmap: lock weights in RAM")
+    no_mmap: bool = Field(False, description="--no-mmap: load all weights eagerly into RAM")
+    mlock: bool = Field(False, description="--mlock: lock model pages in RAM to prevent swapping")
+    flash_attn: bool = Field(
+        False, description="--flash-attn: use flash attention to reduce KV cache usage"
+    )
+    cache_type_k: str = Field(
+        "f16", description="--cache-type-k: KV cache key quantization (f16, q8_0, q4_0)"
+    )
+    cache_type_v: str = Field(
+        "f16", description="--cache-type-v: KV cache value quantization (f16, q8_0, q4_0)"
+    )
 
     def to_cli(self) -> str:
         parts = [f"--ngl {self.ngl}", f"-ub {self.ubatch}", f"--parallel {self.parallel}"]
+        if self.flash_attn:
+            parts.append("--flash-attn")
+        if self.cache_type_k != "f16":
+            parts.append(f"--cache-type-k {self.cache_type_k}")
+        if self.cache_type_v != "f16":
+            parts.append(f"--cache-type-v {self.cache_type_v}")
         if self.n_cpu_moe is not None:
             parts.append(f"--n-cpu-moe {self.n_cpu_moe}")
         if self.no_mmap:
             parts.append("--no-mmap")
+        if self.mlock:
+            parts.append("--mlock")
         return " ".join(parts)
 
 
