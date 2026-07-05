@@ -1,9 +1,4 @@
-"""Application settings and on-disk paths.
-
-Uses :mod:`platformdirs` so data/cache locations are correct on Windows, macOS, and Linux. Every field can be
-overridden with a ``SHADOWBENCH_*`` environment variable, which keeps the sidecar configurable by the Tauri
-host without a config file.
-"""
+"""Application settings and on-disk paths. Uses :mod:`platformdirs`; override via ``SHADOWBENCH_*`` env vars."""
 
 from __future__ import annotations
 

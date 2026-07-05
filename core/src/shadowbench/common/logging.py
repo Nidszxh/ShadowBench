@@ -1,8 +1,4 @@
-"""Logging setup.
-
-A single :func:`configure_logging` entry point wires up Rich-formatted logs for the CLI. The IPC server
-(Phase 3) will swap the handler for structured JSON so the Tauri frontend can parse log lines.
-"""
+"""Logging setup. Rich-formatted console output with guarded single-init."""
 
 from __future__ import annotations
 

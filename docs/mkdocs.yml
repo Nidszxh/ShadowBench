@@ -1,7 +1,8 @@
 site_name: ShadowBench
 site_description: Crowd-sourced, peer-to-peer benchmarking and local inference pooling for open-source AI models.
-repo_url: https://github.com/OWNER/ShadowBench
-docs_dir: docs
+repo_url: https://github.com/Nidszxh/ShadowBench
+docs_dir: .
+site_dir: ../site
 
 theme:
   name: material
@@ -22,10 +23,12 @@ theme:
 
 nav:
   - Home: index.md
-  - Architecture: architecture.md
-  - Dataflow & Math: dataflow.md
-  - Project Structure: structure.md
-  - Milestones: milestones.md
+  - Architecture: plan/ARCHITECTURE.md
+  - Dataflow & Math: plan/DATAFLOW.md
+  - Project Structure: ../PROJECT_STRUCTURE.md
+  - Roadmap: plan/ROADMAP.md
+  - Milestones: plan/MILESTONES.md
+  - Implementation Plan: plan/IMPLEMENTATION_PLAN.md
 
 markdown_extensions:
   - admonition

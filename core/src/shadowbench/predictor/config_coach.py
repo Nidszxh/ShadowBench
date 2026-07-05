@@ -1,12 +1,6 @@
-"""Config Coach — translate a predicted bottleneck into exact runtime flags.
+"""Config Coach — translates predicted bottlenecks into runtime flags.
 
-Implements the flag heuristics from ``DATAFLOW.md §1.5–1.6``:
-  * ``--n-cpu-moe`` scaled to the offloaded-expert fraction on MoE models.
-  * ``-ub`` / ``--ubatch`` raised on slow-PCIe / high-RAM systems so GPU kernels don't stall waiting on
-    streamed expert weights.
-  * ``--parallel`` forced to 1 on low-VRAM machines (multi-slot silently multiplies KV allocation), unless the
-    node is acting as a pool provider.
-  * ``--cache-type-k/v`` downgraded from f16 to q8_0 on low-VRAM or long-context systems.
+Implements flag heuristics (``DATAFLOW.md §1.5–1.6``): expert offload, ubatch size, parallelism, KV cache quant.
 """
 
 from __future__ import annotations

@@ -42,7 +42,7 @@ Running open-source models (Llama 3, Mistral, Phi, Qwen, DeepSeek, etc.) on cons
 | **Predictor** | Applies Dense vs. MoE-aware math to estimate throughput and recommend runtime flags |
 | **Shadow Pool** | mDNS peer discovery, encrypted WebSocket transport, and a local load-balancing proxy |
 
-See [`ARCHITECTURE.md`](./ARCHITECTURE.md) for system design and [`DATAFLOW.md`](./DATAFLOW.md) for how requests move through the system.
+See [`ARCHITECTURE.md`](docs/plan/ARCHITECTURE.md) for system design and [`DATAFLOW.md`](docs/plan/DATAFLOW.md) for how requests move through the system.
 
 ## 6. Recommended Tech Stack
 
@@ -67,12 +67,12 @@ See [`ARCHITECTURE.md`](./ARCHITECTURE.md) for system design and [`DATAFLOW.md`]
 
 ## 8. Documentation Index
 
-- [`ARCHITECTURE.md`](./ARCHITECTURE.md) — system components and how they're organized
-- [`DATAFLOW.md`](./DATAFLOW.md) — request/response lifecycle, P2P protocol, database schema
+- [`ARCHITECTURE.md`](docs/plan/ARCHITECTURE.md) — system components and how they're organized
+- [`DATAFLOW.md`](docs/plan/DATAFLOW.md) — request/response lifecycle, P2P protocol, database schema
 - [`PROJECT_STRUCTURE.md`](./PROJECT_STRUCTURE.md) — the component-wise monorepo layout
-- [`MILESTONES.md`](./MILESTONES.md) — production open-source delivery plan (v0.0.1 → v1.0.0)
-- [`ROADMAP.md`](./ROADMAP.md) — original phased feature plan
-- [`IMPLEMENTATION_PLAN.md`](./IMPLEMENTATION_PLAN.md) — granular build steps, testing, deployment
+- [`MILESTONES.md`](docs/plan/MILESTONES.md) — production open-source delivery plan (v0.0.1 → v1.0.0)
+- [`ROADMAP.md`](docs/plan/ROADMAP.md) — original phased feature plan
+- [`IMPLEMENTATION_PLAN.md`](docs/plan/IMPLEMENTATION_PLAN.md) — granular build steps, testing, deployment
 - [`CONTRIBUTING.md`](./CONTRIBUTING.md) · [`SECURITY.md`](./SECURITY.md) · [`GOVERNANCE.md`](./GOVERNANCE.md)
 
 ## 9. Building From Source (current state)
@@ -85,4 +85,6 @@ scripts/bootstrap.sh              # installs deps + hooks, runs checks
 cd core && uv sync --all-extras
 uv run shadowbench profile        # print this machine's hardware profile
 uv run shadowbench recommend --task coding --profile intelligence
+uv run shadowbench catalog validate                    # validate model catalog
+uv run shadowbench catalog add Qwen/Qwen2.5-7B         # auto-fetch a new model entry
 ```

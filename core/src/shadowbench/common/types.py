@@ -1,8 +1,4 @@
-"""Shared vocabulary used across modules.
-
-Only small, dependency-free value types belong here — enums and the quantization table. Larger data
-contracts live in their producing module's ``models.py`` (e.g. ``profiler.models.HardwareProfile``).
-"""
+"""Shared vocabulary: enums and the quantization table. Larger data contracts live in each module's ``models.py``."""
 
 from __future__ import annotations
 
@@ -17,7 +13,7 @@ class ModelTopology(str, Enum):
 
 
 class Task(str, Enum):
-    """User intent, used by the Requirement Discovery engine to filter candidate models."""
+    """User intent for filtering candidate models."""
 
     CODING = "coding"
     CHAT = "chat"
@@ -33,11 +29,7 @@ class UserProfile(str, Enum):
 
 
 class Quantization(str, Enum):
-    """Common GGUF quantization levels.
-
-    ``effective_bpw`` is the *effective* bits-per-weight including block metadata overhead — this is what the
-    memory formulas in ``DATAFLOW.md §1.1`` actually consume, not the nominal bit count.
-    """
+    """Common GGUF quantization levels. ``effective_bpw`` includes block metadata overhead."""
 
     Q2_K = "Q2_K"
     Q3_K_M = "Q3_K_M"
@@ -65,11 +57,7 @@ _EFFECTIVE_BPW: dict[Quantization, float] = {
 
 
 class KVCacheQuantization(str, Enum):
-    """KV-cache quantization precision (``--cache-type-k`` / ``--cache-type-v``).
-
-    ``bytes_per_elem`` is the storage cost per K *or* V element (K and V are stored separately, hence the
-    ``2×`` multiplier in the KV-cache formula).
-    """
+    """KV-cache quantization precision (``--cache-type-k`` / ``--cache-type-v``)."""
 
     FP16 = "f16"
     Q8_0 = "q8_0"

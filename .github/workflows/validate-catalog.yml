@@ -1,0 +1,35 @@
+name: Validate Catalog
+
+on:
+  pull_request:
+    paths:
+      - "datasets/models_catalog.json"
+      - "core/src/shadowbench/predictor/validate_catalog.py"
+  push:
+    branches: [main]
+    paths:
+      - "datasets/models_catalog.json"
+
+jobs:
+  validate:
+    name: Validate models_catalog.json
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: core
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+
+      - name: Set up Python 3.12
+        run: uv python install 3.12
+
+      - name: Install dependencies
+        run: uv sync --dev
+
+      - name: Validate catalog
+        run: uv run python -m shadowbench.predictor.validate_catalog

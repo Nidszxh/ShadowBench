@@ -13,7 +13,7 @@ setup: ## Create the dev environment and install hooks
 	cd $(CORE) && uv sync --all-extras
 	uv run --project $(CORE) pre-commit install
 
-lint: ## Lint (ruff) + format check (black/ruff-format)
+lint: ## Lint (ruff) + format check (ruff-format)
 	cd $(CORE) && uv run ruff check .
 	cd $(CORE) && uv run ruff format --check .
 

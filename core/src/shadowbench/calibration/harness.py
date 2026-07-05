@@ -1,8 +1,4 @@
-"""Ground-truth benchmark harness.  [Phase 2 — P2.4]
-
-Wraps ``llama-bench`` (or an Ollama run) to measure *real* tokens/sec, so every run can contribute a data
-point to ``datasets/golden.jsonl``. This measured value is the calibration target for the Predictor formulas.
-"""
+"""Ground-truth benchmark harness. Wraps ``llama-bench`` to measure real tokens/sec for ``golden.jsonl``."""
 
 from __future__ import annotations
 

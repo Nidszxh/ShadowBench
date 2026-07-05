@@ -1,15 +1,19 @@
-"""Module 2 — Predictor Engine.
+"""Predictor Engine. Turns ``HardwareProfile`` + intent into a ranked recommendation.
 
-Turns a :class:`~shadowbench.profiler.models.HardwareProfile` + user intent into a ranked model recommendation
-with predicted tokens/sec and exact runtime flags. Branches on model topology (Dense vs. MoE) per
-``DATAFLOW.md §1``.
-
-Public entry point: :func:`~shadowbench.predictor.discovery.recommend`.
+Public entry points: ``recommend``, ``validate_entries``.
 """
 
 from __future__ import annotations
 
 from shadowbench.predictor.discovery import recommend
 from shadowbench.predictor.models import Prediction, Recommendation, RuntimeFlags
+from shadowbench.predictor.validate_catalog import find_catalog_path, validate_entries
 
-__all__ = ["Prediction", "Recommendation", "RuntimeFlags", "recommend"]
+__all__ = [
+    "Prediction",
+    "Recommendation",
+    "RuntimeFlags",
+    "find_catalog_path",
+    "recommend",
+    "validate_entries",
+]

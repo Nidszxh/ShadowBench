@@ -1,15 +1,4 @@
-"""Mixture-of-Experts throughput estimation (``DATAFLOW.md §1.3``).
-
-MoE models only activate a subset of experts per token, so decode reads far fewer bytes than the total weight
-size implies. The predictor:
-
-  1. Forces the non-expert base (attention/embeddings/norms) into VRAM — if it doesn't fit, predict a severe
-     PCIe-fallback penalty.
-  2. Fills remaining VRAM with as many experts as fit; the rest map to system RAM via an ``--n-cpu-moe``-style
-     offload, streamed over PCIe.
-
-Constants marked ``CALIBRATION`` are tuned against ``datasets/golden.jsonl`` in Phase 2.
-"""
+"""MoE throughput estimation (``DATAFLOW.md §1.3``). Only active experts are read per token."""
 
 from __future__ import annotations
 

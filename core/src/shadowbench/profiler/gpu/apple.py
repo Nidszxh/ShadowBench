@@ -1,8 +1,4 @@
-"""Apple Silicon backend.
-
-Apple GPUs share unified memory with the CPU, so "VRAM" is reported as a large fraction of system RAM. We shell
-out to ``system_profiler`` (always present on macOS) rather than adding a native dependency.
-"""
+"""Apple Silicon backend: unified memory, VRAM estimated as fraction of system RAM from system_profiler."""
 
 from __future__ import annotations
 

@@ -1,0 +1,88 @@
+"""Embedded model catalog for pip-installed environments.
+
+Keep in sync with ``datasets/models_catalog.json``.
+"""
+
+from __future__ import annotations
+
+CATALOG_JSON = {
+    "$schema_version": 1,
+    "_comment": "Known-model metadata. Seed values — refine via PR. Prefer reading topology from GGUF headers (see profiler/gguf.py) over trusting these once P1.3 lands.",
+    "models": [
+        {
+            "id": "meta-llama/Meta-Llama-3-8B-Instruct-GGUF",
+            "name": "Llama 3 8B Instruct",
+            "topology": "dense",
+            "tasks": ["coding", "general", "chat"],
+            "n_params_billions": 8.0,
+            "n_layers": 32,
+            "n_kv_heads": 8,
+            "head_dim": 128,
+            "context_default": 8192,
+            "available_quants": ["Q2_K", "Q4_K_M", "Q5_K_M", "Q6_K", "Q8_0"],
+        },
+        {
+            "id": "mistralai/Mistral-7B-Instruct-v0.3-GGUF",
+            "name": "Mistral 7B Instruct v0.3",
+            "topology": "dense",
+            "tasks": ["general", "chat"],
+            "n_params_billions": 7.2,
+            "n_layers": 32,
+            "n_kv_heads": 8,
+            "head_dim": 128,
+            "context_default": 8192,
+            "available_quants": ["Q2_K", "Q4_K_M", "Q5_K_M", "Q6_K", "Q8_0"],
+        },
+        {
+            "id": "microsoft/Phi-3-medium-4k-instruct-GGUF",
+            "name": "Phi-3 Medium (14B)",
+            "topology": "dense",
+            "tasks": ["general", "reasoning"],
+            "n_params_billions": 14.0,
+            "n_layers": 40,
+            "n_kv_heads": 10,
+            "head_dim": 128,
+            "context_default": 4096,
+            "available_quants": ["Q2_K", "Q4_K_M", "Q5_K_M", "Q6_K"],
+        },
+        {
+            "id": "deepseek-ai/DeepSeek-R1-Distill-Qwen-14B-GGUF",
+            "name": "DeepSeek-R1 Distill 14B",
+            "topology": "dense",
+            "tasks": ["coding", "reasoning"],
+            "n_params_billions": 14.8,
+            "n_layers": 48,
+            "n_kv_heads": 8,
+            "head_dim": 128,
+            "context_default": 4096,
+            "available_quants": ["Q2_K", "Q4_K_M", "Q5_K_M", "Q6_K"],
+        },
+        {
+            "id": "Qwen/Qwen3.6-35B-A3B-GGUF",
+            "name": "Qwen3.6 35B-A3B (MoE)",
+            "topology": "moe",
+            "tasks": ["coding", "reasoning", "general"],
+            "n_params_billions": 35.0,
+            "n_params_active_billions": 3.0,
+            "n_layers": 48,
+            "n_kv_heads": 8,
+            "head_dim": 128,
+            "context_default": 4096,
+            "available_quants": ["Q2_K", "Q4_K_M", "Q5_K_M", "Q6_K"],
+            "n_experts": 256,
+            "n_experts_active": 8,
+        },
+        {
+            "id": "meta-llama/Llama-3.2-1B-Instruct-GGUF",
+            "name": "Llama 3.2 1B Instruct",
+            "topology": "dense",
+            "tasks": ["general", "chat"],
+            "n_params_billions": 1.24,
+            "n_layers": 16,
+            "n_kv_heads": 8,
+            "head_dim": 64,
+            "context_default": 8192,
+            "available_quants": ["Q2_K", "Q4_K_M", "Q5_K_M", "Q6_K", "Q8_0"],
+        },
+    ],
+}

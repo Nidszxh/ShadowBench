@@ -1,9 +1,4 @@
-"""Hardware data contract produced by the Profiler and consumed by the Predictor.
-
-These models are the handoff between Module 1 and Module 2. They are designed so that
-:meth:`HardwareProfile.anonymized` can strip/bucket everything before it is ever synced to the public
-calibration dataset (see ``calibration.sync``).
-"""
+"""Hardware data contract produced by the Profiler and consumed by the Predictor."""
 
 from __future__ import annotations
 
@@ -16,7 +11,7 @@ PROFILE_SCHEMA_VERSION = 1
 class GpuInfo(BaseModel):
     """A single detected GPU (or unified-memory device on Apple Silicon)."""
 
-    vendor: str = Field(description="nvidia | apple | amd | cpu")
+    vendor: str = Field(description="nvidia | intel | apple | amd | cpu")
     name: str
     vram_total_mb: int
     vram_free_mb: int
@@ -35,11 +30,7 @@ class SystemInfo(BaseModel):
 
 
 class BandwidthResult(BaseModel):
-    """Measured — not spec-sheet — data-transfer and compute throughput.
-
-    ``cpu_matmul_gbps`` is the CPU matmul benchmark, retained for future multi-GPU topologies.
-    ``system_ram_gbps`` is the CPU-side memory bandwidth used to estimate CPU-offloaded inference performance.
-    """
+    """Measured (not spec-sheet) data-transfer and compute throughput."""
 
     cpu_matmul_gbps: float
     device_compute_tflops: float
@@ -60,11 +51,7 @@ class HardwareProfile(BaseModel):
         return self.gpu is not None
 
     def anonymized(self) -> dict[str, object]:
-        """Return a PII-free, bucketed dict safe for the public calibration dataset.
-
-        Deliberately drops nothing identifying (no hostname/IP is ever collected here) and buckets memory to
-        coarse bins so exact machine fingerprints cannot be reconstructed.
-        """
+        """Return a PII-free, bucketed dict safe for the public calibration dataset."""
         return {
             "schema_version": self.schema_version,
             "gpu_vendor": self.gpu.vendor if self.gpu else "cpu",
@@ -79,10 +66,6 @@ class HardwareProfile(BaseModel):
 
 
 def _bucket_gb(mb: int) -> int:
-    """Bucket a megabyte value to the nearest 4 GB to avoid exact fingerprinting.
-
-    Uses decimal GB (1 GB = 1000 MB) to stay consistent with the predictor formulas, which
-    use ``1e9`` for byte-to-GB conversion (SI prefix convention).
-    """
+    """Round a megabyte value to the nearest 4 GB (decimal) to avoid exact fingerprinting."""
     gb = mb / 1000
     return round(gb / 4) * 4

@@ -1,8 +1,4 @@
-"""Requirement Discovery engine (``ARCHITECTURE.md §3.2``).
-
-Maps the 3-variable matrix — Task × Hardware × User profile — to a ranked recommendation. This is the single
-public entry point of the Predictor module.
-"""
+"""Requirement Discovery (``ARCHITECTURE.md §3.2``). Maps Task × Hardware × Profile → ranked recommendation."""
 
 from __future__ import annotations
 
@@ -15,6 +11,13 @@ from shadowbench.predictor.dense import estimate_dense_tps
 from shadowbench.predictor.models import ModelSpec, Prediction, Recommendation
 from shadowbench.predictor.moe import estimate_moe_tps
 from shadowbench.profiler.models import HardwareProfile
+
+#: Fallback system-RAM bandwidth (GB/s) when the profiler produces no measurement.
+#: Conservative DDR4 single-channel floor; the real value is always measured (~0.1 s) by
+#: ``profile_hardware`` even when the full stress test is skipped.
+_FALLBACK_RAM_GBPS = 15.0
+#: Fallback PCIe bandwidth — reserved for future multi-GPU; currently unused in math.
+_FALLBACK_PCIE_GBPS = 8.0
 
 #: A recommendation must clear this floor to be considered "usable".
 _MIN_USABLE_TPS = 5.0
@@ -72,8 +75,8 @@ def _best_recommendation_for(
     """Pick the highest-quality quant for one model that stays usable on this hardware."""
     ctx = context_length or spec.context_default
     vram_gb = (profile.gpu.vram_total_mb / 1000) if profile.gpu else 0.0
-    pcie_gbps = profile.bandwidth.cpu_matmul_gbps if profile.bandwidth else 8.0
-    ram_gbps = profile.bandwidth.system_ram_gbps if profile.bandwidth else 30.0
+    pcie_gbps = profile.bandwidth.cpu_matmul_gbps if profile.bandwidth else _FALLBACK_PCIE_GBPS
+    ram_gbps = profile.bandwidth.system_ram_gbps if profile.bandwidth else _FALLBACK_RAM_GBPS
 
     for quant in _QUANT_PREFERENCE:
         if quant not in spec.available_quants:
@@ -106,7 +109,7 @@ def _predict(
     ctx: int,
     vram_gb: float,
     pcie_gbps: float,
-    ram_gbps: float = 30.0,
+    ram_gbps: float = _FALLBACK_RAM_GBPS,
     *,
     kv_quant: KVCacheQuantization = KVCacheQuantization.FP16,
 ) -> tuple[Prediction, float]:

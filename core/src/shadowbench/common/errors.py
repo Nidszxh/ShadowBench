@@ -1,8 +1,4 @@
-"""Typed error hierarchy.
-
-Every user-facing failure should raise a :class:`ShadowBenchError` subclass rather than a bare exception,
-so the CLI and IPC layers can render clean, actionable messages instead of tracebacks.
-"""
+"""Typed error hierarchy. Raise :class:`ShadowBenchError` subclasses instead of bare exceptions."""
 
 from __future__ import annotations
 

@@ -1,11 +1,4 @@
-"""Dense-model throughput estimation (``DATAFLOW.md §1.4``, dense branch).
-
-Decode is memory-bound: every weight is read once per generated token, so tokens/sec ≈ effective memory
-bandwidth ÷ resident weight size. When the model spills out of VRAM, the spilled fraction is streamed over the
-(much slower) PCIe bus each token, producing the characteristic performance cliff.
-
-Constants marked ``CALIBRATION`` are first-order defaults tuned against ``datasets/golden.jsonl`` in Phase 2.
-"""
+"""Dense-model throughput estimation (``DATAFLOW.md §1.4``). Decode is memory-bound; spilled layers run on CPU."""
 
 from __future__ import annotations
 

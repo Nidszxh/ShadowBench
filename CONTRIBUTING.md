@@ -35,10 +35,10 @@ uv run --project core pre-commit install
 ## The dev loop
 
 ```bash
-make lint        # ruff + black --check
+make lint        # ruff check + ruff format --check
 make typecheck   # mypy
 make test        # pytest with coverage
-make format      # auto-fix with ruff + black
+make format      # auto-fix with ruff --fix + ruff format
 make check       # everything CI runs, locally
 ```
 

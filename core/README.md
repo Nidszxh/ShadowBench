@@ -4,8 +4,8 @@ The Python sidecar that powers ShadowBench — hardware profiling, throughput pr
 peer-to-peer inference pool. It runs standalone as a CLI and is embedded by the Tauri desktop app as a sidecar
 process.
 
-See [`../PROJECT_STRUCTURE.md`](../PROJECT_STRUCTURE.md) for the package layout and
-[`../DATAFLOW.md`](../DATAFLOW.md) for the math each module implements.
+See [`PROJECT_STRUCTURE.md`](https://github.com/Nidszxh/ShadowBench/blob/main/PROJECT_STRUCTURE.md) for the package layout and
+[`DATAFLOW.md`](https://github.com/Nidszxh/ShadowBench/blob/main/docs/plan/DATAFLOW.md) for the math each module implements.
 
 ## Install (development)
 

@@ -1,8 +1,4 @@
-"""Accuracy report: predicted vs. actual.  [Phase 2 — P2.5]
-
-Computes error metrics across ``datasets/golden.jsonl`` and emits a report. CI fails when median error
-regresses past the configured band — the accuracy gate.
-"""
+"""Accuracy report: predicted vs. actual across ``datasets/golden.jsonl``. CI accuracy gate."""
 
 from __future__ import annotations
 

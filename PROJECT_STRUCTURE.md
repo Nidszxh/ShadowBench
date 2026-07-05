@@ -1,7 +1,7 @@
 # ShadowBench — Project Structure
 
 A **component-wise monorepo**. The guiding rule: the three architectural modules from
-[`ARCHITECTURE.md`](./ARCHITECTURE.md) — **Profiler**, **Predictor**, **Shadow Pool** — map to three
+[`ARCHITECTURE.md`](docs/plan/ARCHITECTURE.md) — **Profiler**, **Predictor**, **Shadow Pool** — map to three
 self-contained Python packages with narrow, typed public interfaces. You can build, test, and reason about
 each in isolation.
 
@@ -34,7 +34,7 @@ ShadowBench/
 
 ```
 core/
-├── pyproject.toml                 # PEP 621 metadata, deps, ruff/black/mypy/pytest config
+├── pyproject.toml                 # PEP 621 metadata, deps, ruff/mypy/pytest config
 ├── README.md
 ├── src/shadowbench/
 │   ├── __init__.py                # version, PROTOCOL_VERSION
@@ -54,11 +54,12 @@ core/
 │   │   ├── bandwidth.py           # bounded PCIe/compute stress kernel (GB/s, TFLOPS)
 │   │   ├── gguf.py                # GGUF header parser (topology, quant, layers)
 │   │   └── gpu/                   # swappable per-vendor backends
-│   │       ├── base.py            # GpuBackend ABC + registry/auto-select
-│   │       ├── nvidia.py          # pynvml
-│   │       ├── apple.py           # Metal / system_profiler (unified memory)
-│   │       ├── amd.py             # ROCm SMI
-│   │       └── cpu.py             # graceful CPU-only fallback
+    │   │       ├── base.py            # GpuBackend ABC + registry/auto-select
+    │   │       ├── nvidia.py          # pynvml + nvidia-smi fallback
+    │   │       ├── intel.py           # sysfs (vendor 0x8086) — integrated + discrete
+    │   │       ├── apple.py           # system_profiler (unified memory)
+    │   │       ├── amd.py             # ROCm SMI + sysfs fallback
+    │   │       └── cpu.py             # graceful CPU-only fallback
 │   │
 │   ├── predictor/                 # ── MODULE 2: Predictor Engine ──
 │   │   ├── models.py              # Prediction, Recommendation, RuntimeFlags
@@ -82,8 +83,7 @@ core/
 │   │
 │   ├── storage/                   # local datastore + calibration data  [Phase 3]
 │   │   ├── db.py                  # SQLite access layer
-│   │   ├── schema.sql             # hardware_profiles, benchmark_runs (DATAFLOW §5)
-│   │   └── migrations/            # forward-only migrations
+│   │   └── schema.sql             # hardware_profiles, benchmark_runs (DATAFLOW §5)
 │   │
 │   ├── calibration/               # accuracy self-correction loop  [Phase 2/5]
 │   │   ├── harness.py             # ground truth via llama-bench
@@ -94,9 +94,7 @@ core/
 │       └── server.py              # JSON-RPC over stdio: profile_system/analyze_requirement/run_model
 │
 └── tests/
-    ├── unit/                      # pure-math + parser tests (fast, no hardware)
-    ├── integration/               # end-to-end profile→recommend (may touch hardware)
-    └── fixtures/                  # sample GGUF headers, golden hardware profiles
+    └── unit/                      # pure-math + parser tests (fast, no hardware)
 ```
 
 ## `frontend/` — Tauri shell (Phase 3, scaffolded later)

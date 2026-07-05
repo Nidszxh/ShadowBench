@@ -1,0 +1,61 @@
+name: Publish
+
+# Publishes shadowbench to PyPI when a v* tag is pushed.
+# Requires trusted publishing to be configured on PyPI:
+#   https://pypi.org/manage/account/publishing/
+#   - PyPI project: shadowbench
+#   - GitHub owner: Nidszxh
+#   - GitHub repo:  ShadowBench
+#   - Workflow:     publish.yml
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      pypi_target:
+        description: "PyPI target (pypi or testpypi)"
+        default: "testpypi"
+        type: choice
+        options:
+          - testpypi
+          - pypi
+
+permissions:
+  id-token: write  # required for PyPI trusted publishing
+  contents: read
+
+jobs:
+  publish:
+    name: Publish to PyPI
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: core
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+
+      - name: Set up Python 3.12
+        run: uv python install 3.12
+
+      - name: Build
+        run: uv build
+
+      - name: Publish to PyPI
+        if: github.event.inputs.pypi_target != 'testpypi' && !startsWith(github.ref, 'refs/tags/v0.0.')
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: core/dist/
+          # Trusted publishing via OIDC — configure at https://pypi.org/manage/account/publishing/
+
+      - name: Publish to TestPyPI
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.pypi_target == 'testpypi'
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: core/dist/
+          repository-url: https://test.pypi.org/legacy/
+          skip-existing: true

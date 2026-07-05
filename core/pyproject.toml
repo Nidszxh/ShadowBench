@@ -1,6 +1,6 @@
 [project]
 name = "shadowbench"
-version = "0.0.1"
+version = "0.2.1"
 description = "Crowd-sourced, peer-to-peer benchmarking and local inference pooling for open-source AI models."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -54,10 +54,10 @@ dev = [
 shadowbench = "shadowbench.cli:app"
 
 [project.urls]
-Homepage = "https://github.com/OWNER/ShadowBench"
-Documentation = "https://github.com/OWNER/ShadowBench/tree/main/docs"
-Repository = "https://github.com/OWNER/ShadowBench"
-Issues = "https://github.com/OWNER/ShadowBench/issues"
+Homepage = "https://github.com/Nidszxh/ShadowBench"
+Documentation = "https://github.com/Nidszxh/ShadowBench/tree/main/docs"
+Repository = "https://github.com/Nidszxh/ShadowBench"
+Issues = "https://github.com/Nidszxh/ShadowBench/issues"
 
 [build-system]
 requires = ["hatchling"]
@@ -85,7 +85,7 @@ ignore = [
 ]
 
 [tool.mypy]
-python_version = "3.11"
+python_version = "3.12"
 strict = true
 packages = ["shadowbench"]
 mypy_path = "src"
@@ -95,6 +95,8 @@ plugins = ["pydantic.mypy"]
 # Optional/hardware deps without stubs — don't fail typecheck on missing imports.
 module = ["pynvml.*", "zeroconf.*", "gguf.*"]
 ignore_missing_imports = true
+
+
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
